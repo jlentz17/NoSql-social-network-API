@@ -1,14 +1,11 @@
-const { User } = require("../models");
+const { User, Thought } = require("../models");
 
 const userController = {
   getAllUser(req, res) {
     User.find({})
     .populate({
-      path: "comments",
+      path: "thoughts",
       select: "-__v",
-    })
-    .populate({
-      path: ("thoughts")
     })
     .select("-__v")
     .sort({ _id: -1 })
@@ -19,8 +16,17 @@ const userController = {
       });
   },
 
-  getUserById(req, res) {
+  getUserById({ params }, res ) {
     User.findOne({ _id: params.id })
+    .populate({
+      path: "thoughts",
+      select: "-__v",
+    })
+    .populate({
+      path: "friends",
+      select: "-__v",
+    })
+    .select("-__v")
       .then((data) => {
         console.log(data)
         if (!data) {
@@ -54,7 +60,8 @@ const userController = {
         if (!data) {
           res.status(404).json({ message: "No user found with this id" });
         }
-        res.json(data);
+        // could do res.json(data) but we don't need the data. We just need to know that it was deleted.
+        res.json(true);
       })
       .catch((err) => res.status(400).json(err));
   },

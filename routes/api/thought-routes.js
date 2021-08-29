@@ -5,15 +5,15 @@ const {
     createThought,
     updateThought,
     deleteThought
-} = require("../../controllers/user-controller")
+} = require("../../controllers/thought-controller")
 
 router
-    .route("/")
+    .route("/:userId")
     .get(getAllThought)
     .post(createThought)
 
 router
-    .route("/:id")
+    .route("/:userId/:thoughtId")
     .get(getThoughtById)
     .put(updateThought)
     .delete(deleteThought)

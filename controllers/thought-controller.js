@@ -56,7 +56,7 @@ const thoughtController = {
       });
   },
   updateThought({ params, body }, res) {
-    Thought.findOneAndUpdate({ _id: params.id }, body, { new: true })
+    Thought.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
       .then((data) => {
         if (!data) {
           res.status(404).json({ message: "No thought found with this id" });
@@ -86,7 +86,8 @@ const thoughtController = {
           res.status(404).json({ message: "No user found with this id" });
           return;
         }
-        res.json(data);
+        // could do res.json(data) but we don't need the data. We just need to know that it was deleted.
+        res.json(true);
       })
       .catch((err) => {
         console.log(err);
