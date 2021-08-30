@@ -1,7 +1,7 @@
 const { User, Thought } = require("../models");
 
 const userController = {
-  getAllUser(req, res) {
+  getAllUsers(req, res) {
     User.find({})
       .populate({
         path: "thoughts",
@@ -52,6 +52,7 @@ const userController = {
       .then((data) => {
         if (!data) {
           res.status(404).json({ message: "No user found with this id" });
+          return;
         }
         res.json(data);
       })
@@ -62,11 +63,67 @@ const userController = {
       .then((data) => {
         if (!data) {
           res.status(404).json({ message: "No user found with this id" });
+          return;
         }
         // could do res.json(data) but we don't need the data. We just need to know that it was deleted.
         res.json(true);
       })
       .catch((err) => res.status(400).json(err));
+  },
+
+  createFriend({ params }, res) {
+    User.findOneAndUpdate(
+      { _id: params.userId },
+      { $addToSet: { friends: params.friendId } },
+      { new: true }
+    ).then((data) => {
+      if (!data) {
+        res.status(404).json({ message: "No friend with this id" });
+        return;
+      }
+      User.findOneAndUpdate(
+        { _id: params.friendId },
+        { $addToSet: { friends: params.userId } },
+        { new: true }
+      )
+        .then((data) => {
+          if (!data) {
+            res.status(404).json({ message: "No friend with this id" });
+          }
+          res.json(data);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json(err);
+        });
+    });
+  },
+  deleteFriend({ params }, res) {
+    User.findOneAndUpdate(
+      { _id: params.userId },
+      { $pull: { freinds: params.friendId } },
+      { new: true }
+    ).then((data) => {
+      if (!data) {
+        res.status(404).json({ message: "No friend found with this id" });
+        return;
+      }
+      User.findOneAndUpdate(
+        { _id: params.friendId },
+        { $pull: { friends: params.userId } },
+        { new: true }
+      )
+        .then((data) => {
+          if (!data) {
+            res.status(404).json({ message: "No friend with this id" });
+          }
+          res.json(data);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json(err);
+        });
+    });
   },
 };
 
