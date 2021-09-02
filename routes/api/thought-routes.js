@@ -11,10 +11,13 @@ const {
 
 // /api/thoughts
 router
-    .route("/")
-    .get(getAllThoughts)
-    .post(createThought)
+.route("/")
+.get(getAllThoughts)
+// .post(createThought)
 
+router
+    .route("/:userId")
+    .post(createThought)
 // Get, PUT, DELETE at /api/thoughts/:id
 router
     .route("/:id")

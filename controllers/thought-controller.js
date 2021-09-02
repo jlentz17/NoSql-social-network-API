@@ -44,25 +44,24 @@ const thoughtController = {
         res.status(400).json(err);
       });
   },
-  createThought({ params, body }, res) {
-    Thought.create(body)
+  createThought(req, res) {
+    Thought.create(req.body)
       .then(({ _id }) => {
         return User.findOneAndUpdate(
-          { _id: params.userId },
+          { _id: req.params.userId },
           { $push: { thoughts: _id } },
           { new: true }
         );
       })
       .then((data) => {
         if (!data) {
-          res.status(404).json({ message: "No user found with this id" });
-          return;
+          return res.status(404).json({ message: "No user found with this id" });
         }
         res.json(data);
       })
       .catch((err) => {
         console.log(err);
-        res.status(400).json(err);
+        res.status(400).json();
       });
   },
   updateThought({ params, body }, res) {
